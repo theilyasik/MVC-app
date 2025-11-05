@@ -17,9 +17,9 @@ Route::get('/clients/{id}', [ClientController::class, 'show']);
 Route::get('/cosmetologists', [CosmetologistController::class, 'index']);
 Route::get('/cosmetologists/{id}', [CosmetologistController::class, 'show']);
 
-// M→M
-Route::get('/sessions/{id}', [SessionController::class, 'show']);
+// список/создание/редактирование/удаление + show
+Route::resource('sessions', SessionController::class)
+    ->only(['index','create','store','show','edit','update','destroy']);
 
-// список услуг
-Route::get('/services', [ServiceController::class, 'index']);
-Route::get('/services/{id}', [ServiceController::class, 'show']);
+Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
