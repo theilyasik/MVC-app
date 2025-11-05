@@ -1,5 +1,7 @@
 @extends('layout')
 
+@section('title', 'Услуга: '.$service->name)
+
 @section('content')
 <h1>Услуга: {{ $service->name }}</h1>
 <p><b>Базовая цена:</b> {{ number_format($service->price_cents/100, 2, ',', ' ') }} ₽</p>
@@ -14,12 +16,13 @@
   <ul>
     @foreach($service->sessions as $s)
       <li>
-        <a href="{{ url('/sessions/'.$s->id) }}">Сеанс #{{ $s->id }}</a> —
-        Клиент: {{ optional($s->client)->full_name }},
-        Косметолог: {{ optional($s->cosmetologist)->full_name }},
-        {{ $s->starts_at }} → {{ $s->ends_at }}
-        (x{{ $s->pivot->quantity }},
-         {{ number_format($s->pivot->unit_price_cents/100, 2, ',', ' ') }} ₽)
+        <a href="{{ url('/sessions/'.$s->id) }}">
+          {{ $s->starts_at }} → {{ $s->ends_at }} ({{ $s->status }})
+        </a>
+        — Клиент: {{ optional($s->client)->full_name }},
+        Косметолог: {{ optional($s->cosmetologist)->full_name }}
+        — x{{ $s->pivot->quantity }},
+        {{ number_format($s->pivot->unit_price_cents/100, 2, ',', ' ') }} ₽
       </li>
     @endforeach
   </ul>

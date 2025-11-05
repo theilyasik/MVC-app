@@ -3,38 +3,48 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('provided_services', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
 
-            $table->integer('session_id')->unsigned();
-            $table->integer('service_id')->unsigned();
+            // FK на сеанс и услугу
+            $table->foreignId('session_id')
+                ->constrained('sessions')
+                ->cascadeOnDelete(); // удаляем оказанные услуги при удалении сеанса
 
+            $table->foreignId('service_id')
+                ->constrained('services')
+                ->restrictOnDelete(); // услугу удалить нельзя, пока есть ссылки
+
+            // Кол-во и цена
             $table->integer('quantity')->default(1);
             $table->integer('unit_price_cents');
 
+            // Уникальность: одна и та же услуга в сеансе — одна строка
+            $table->unique(['session_id', 'service_id'], 'ps_unique_service_per_session');
+
+            // Таймстемпы
             $table->timestampTz('created_at')->useCurrent();
             $table->timestampTz('updated_at')->useCurrent()->useCurrentOnUpdate();
-
-            // Внешние ключи
-            $table->foreign('session_id')
-                  ->references('id')->on('sessions')
-                  ->onDelete('cascade'); // удаляем услуги при удалении приёма
-
-            $table->foreign('service_id')
-                  ->references('id')->on('services')
-                  ->onDelete('restrict'); // нельзя удалить услугу, если есть проведённые
-
-            // Уникальность услуги в рамках одного приёма
-            $table->unique(['session_id','service_id'], 'ps_unique_service_per_session');
-
-            // CHECK-и
-            $table->check('quantity >= 1', 'provided_services_quantity_check');
-            $table->check('unit_price_cents >= 0', 'provided_services_unit_price_cents_check');
         });
+
+        // CHECK-ограничения
+        DB::statement("
+            ALTER TABLE provided_services
+            ADD CONSTRAINT provided_services_quantity_check
+            CHECK (quantity >= 1)
+        ");
+
+        DB::statement("
+            ALTER TABLE provided_services
+            ADD CONSTRAINT provided_services_unit_price_cents_check
+            CHECK (unit_price_cents >= 0)
+        ");
     }
 
     public function down(): void
