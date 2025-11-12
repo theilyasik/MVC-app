@@ -3,7 +3,7 @@
 @section('content')
   <h1>Сеансы</h1>
 
-  {{-- Панель управления: выбор количества на странице + кнопка создания --}}
+  {{-- Панель управления: выбор количества на странице + (для авторизованных) кнопка создания --}}
   <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px;">
     <form action="{{ route('sessions.index') }}" method="GET">
       <label for="perpage">На странице:</label>
@@ -13,6 +13,7 @@
           <option value="{{ $opt }}" {{ $pp === $opt ? 'selected' : '' }}>{{ $opt }}</option>
         @endforeach
       </select>
+
       {{-- Сохраняем прочие GET-параметры, если появятся в будущем --}}
       @foreach(request()->except('perpage','page') as $k => $v)
         <input type="hidden" name="{{ $k }}" value="{{ $v }}">
@@ -20,7 +21,9 @@
       <noscript><button type="submit">Показать</button></noscript>
     </form>
 
-    <a href="{{ route('sessions.create') }}">+ Создать сеанс</a>
+    @auth
+      <a href="{{ route('sessions.create') }}">+ Создать сеанс</a>
+    @endauth
   </div>
 
   {{-- Сообщение об успехе --}}
@@ -45,9 +48,7 @@
       <tbody>
         @foreach($sessions as $s)
           <tr>
-            <td>
-              <a href="{{ route('sessions.show', $s->id) }}">#{{ $s->id }}</a>
-            </td>
+            <td><a href="{{ route('sessions.show', $s->id) }}">#{{ $s->id }}</a></td>
             <td>{{ optional($s->client)->full_name ?? '—' }}</td>
             <td>{{ optional($s->cosmetologist)->full_name ?? '—' }}</td>
             <td>{{ $s->starts_at }} → {{ $s->ends_at }}</td>
@@ -61,23 +62,31 @@
               @endif
             </td>
             <td>
-              <a href="{{ route('sessions.edit', $s->id) }}">Редактировать</a>
-              &nbsp;|&nbsp;
-              <form action="{{ route('sessions.destroy', $s->id) }}"
-                    method="POST"
-                    style="display:inline"
-                    onsubmit="return confirm('Удалить этот сеанс?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit">Удалить</button>
-              </form>
-            </td>
+            @auth
+              @can('edit-session', $s)
+                <a href="{{ route('sessions.edit', $s->id) }}">Редактировать</a>
+              @endcan
+
+              @can('delete-session', $s)
+                &nbsp;|&nbsp;
+                <form action="{{ route('sessions.destroy', $s->id) }}"
+                      method="POST"
+                      style="display:inline"
+                      onsubmit="return confirm('Удалить этот сеанс?');">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit">Удалить</button>
+                </form>
+             @endcan
+            @else
+    —
+            @endauth
+          </td>
           </tr>
         @endforeach
       </tbody>
     </table>
 
-    {{-- Пагинация. Если контроллер использует withQueryString(), достаточно просто links(). --}}
     <div style="margin-top:16px;">
       {{ $sessions->links() }}
     </div>

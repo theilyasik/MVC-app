@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Cosmetologist;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class SessionController extends Controller
 {
@@ -60,37 +61,50 @@ class SessionController extends Controller
     }
 
     public function edit(Session $session)
-    {
-        return view('sessions.edit', [
-            'session'         => $session,
-            'clients'         => Client::orderBy('full_name')->get(),
-            'cosmetologists'  => Cosmetologist::orderBy('full_name')->get(),
-        ]);
+{
+    if (Gate::denies('edit-session', $session)) {
+        return redirect()->route('error')
+            ->with('message', "Недостаточно прав для редактирования сеанса #{$session->id}");
     }
+
+    return view('sessions.edit', [
+        'session'         => $session->load(['client','cosmetologist','services']),
+        'clients'         => Client::orderBy('full_name')->get(),
+        'cosmetologists'  => Cosmetologist::orderBy('full_name')->get(),
+    ]);
+}
 
     public function update(Request $request, Session $session)
-    {
-        $data = $request->validate([
-            'client_id'        => ['required','exists:clients,id'],
-            'cosmetologist_id' => ['required','exists:cosmetologists,id'],
-            'starts_at'        => ['required','date'],
-            'ends_at'          => ['required','date','after:starts_at'],
-            'room'             => ['nullable','string','max:50'],
-            'status'           => ['required', Rule::in(['scheduled','done','canceled','no_show'])],
-            'notes'            => ['nullable','string'],
-        ]);
-
-        $session->update($data);
-
-        return redirect()->route('sessions.show', $session->id)
-            ->with('success', 'Сеанс обновлён');
+{
+    if (Gate::denies('edit-session', $session)) {
+        return redirect()->route('error')
+            ->with('message', "Недостаточно прав для редактирования сеанса #{$session->id}");
     }
 
+    $data = $request->validate([
+        'client_id'        => ['required','exists:clients,id'],
+        'cosmetologist_id' => ['required','exists:cosmetologists,id'],
+        'starts_at'        => ['required','date'],
+        'ends_at'          => ['required','date','after:starts_at'],
+        'room'             => ['nullable','string','max:50'],
+        'status'           => ['required', Rule::in(['scheduled','done','canceled','no_show'])],
+        'notes'            => ['nullable','string'],
+    ]);
+
+    $session->update($data);
+
+    return redirect()->route('sessions.show', $session->id)
+        ->with('success', 'Сеанс обновлён');
+}
     public function destroy(Session $session)
     {
-        $session->delete();
+    if (Gate::denies('delete-session', $session)) {
+        return redirect()->route('error')->with('message', "Недостаточно прав для удаления сеанса #{$session->id}");
+    }
 
-        return redirect()->route('sessions.index')
-            ->with('success', 'Сеанс удалён');
+    $session->delete();
+
+    return redirect()->route('sessions.index')
+        ->with('success', 'Сеанс удалён');
     }
 }
