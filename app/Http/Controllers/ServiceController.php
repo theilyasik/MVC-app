@@ -8,12 +8,18 @@ use Illuminate\Http\Request;
 class ServiceController extends Controller
 {
     // список услуг
-    public function index()
-    {
-    $services = \App\Models\Service::orderBy('name')->get();
-    return view('services.index', compact('services'));
-    }
+    public function index(Request $request)
+{
+    $perpage = (int) $request->query('perpage', 15);
+    $perpage = $perpage > 0 ? $perpage : 15;
 
+    $services = Service::withCount('sessions')
+        ->orderBy('name')
+        ->paginate($perpage)
+        ->withQueryString();
+
+    return view('services.index', compact('services'));
+}
 
     // просмотр конкретной услуги + связанные сеансы
     public function show(int $id)

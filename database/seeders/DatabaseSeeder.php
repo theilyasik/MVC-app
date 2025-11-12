@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         CosmetologistsTableSeeder::class,
         ServicesTableSeeder::class,
         DemoSessionsSeeder::class,
+        BulkSessionsSeeder::class,
     ]);
 }
 

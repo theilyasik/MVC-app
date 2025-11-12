@@ -10,13 +10,21 @@ use Illuminate\Validation\Rule;
 
 class SessionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sessions = Session::with(['client','cosmetologist','services'])
-            ->orderBy('starts_at','desc')
-            ->get();
+    // perpage из query (?perpage=...), с простыми ограничениями
+    $perPage = (int) $request->query('perpage', 15);
+    $perPage = max(1, min($perPage, 100));
 
-        return view('sessions.index', compact('sessions'));
+    $sessions = Session::with(['client', 'cosmetologist', 'services'])
+        ->orderByDesc('starts_at')
+        ->paginate($perPage)        // получаем пагинатор
+        ->withQueryString();        // чтобы ?perpage сохранялся при кликах
+
+    return view('sessions.index', [
+        'sessions' => $sessions,
+        'perPage'  => $perPage,
+    ]);
     }
 
     public function create()
