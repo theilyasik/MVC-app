@@ -62,9 +62,9 @@
                                     <div class="d-flex flex-column flex-md-row gap-3 align-items-md-center justify-content-between">
                                         <div>
                                             <a href="{{ route('sessions.show', $session->id) }}" class="text-decoration-none">
-                                                <h3 class="h5 fw-semibold mb-1" style="color: var(--brand-primary);">{{ $session->starts_at->translatedFormat('d MMMM Y, HH:mm') }}</h3>
+                                                <h3 class="h5 fw-semibold mb-1" style="color: var(--brand-primary);">{{ $session->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }}</h3>
                                             </a>
-                                            <div class="text-muted small">до {{ $session->ends_at->translatedFormat('HH:mm') }} · Кабинет {{ $session->room ?? 'не указан' }}</div>
+                                            <div class="text-muted small">до {{ $session->ends_at->locale(app()->getLocale())->isoFormat('HH:mm') }} · Кабинет {{ $session->room ?? 'не указан' }}</div>
                                             <div class="mt-3 d-flex flex-wrap gap-2">
                                                 <span class="badge rounded-pill text-bg-light" style="color: var(--brand-primary);">Клиент: {{ optional($session->client)->full_name ?? '—' }}</span>
                                                 <span class="badge rounded-pill text-bg-light">Статус: {{ $statusLabels[$session->status] ?? $session->status }}</span>

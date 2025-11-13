@@ -5,7 +5,7 @@
 
 <p><b>Клиент:</b> {{ optional($session->client)->full_name }}</p>
 <p><b>Косметолог:</b> {{ optional($session->cosmetologist)->full_name }}</p>
-<p><b>Время:</b> {{ $session->starts_at }} → {{ $session->ends_at }}</p>
+<p><b>Время:</b> {{ $session->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }} → {{ $session->ends_at->locale(app()->getLocale())->isoFormat('HH:mm') }}</p>
 <p><b>Кабинет:</b> {{ $session->room ?? '—' }}</p>
 <p><b>Статус:</b> {{ $session->status }}</p>
 <p><b>Заметки:</b> {{ $session->notes ?? '—' }}</p>
