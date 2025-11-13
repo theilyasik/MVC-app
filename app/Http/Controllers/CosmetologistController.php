@@ -14,7 +14,12 @@ class CosmetologistController extends Controller
 
     public function show($id)
     {
-        $cosmetologist = Cosmetologist::with(['sessions.client'])->findOrFail($id);
+        $cosmetologist = Cosmetologist::with([
+            'sessions' => fn ($query) => $query
+                ->with(['client', 'services'])
+                ->orderByDesc('starts_at'),
+        ])->findOrFail($id);
+
         return view('cosmetologists.show', compact('cosmetologist'));
     }
 }

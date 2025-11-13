@@ -1,75 +1,32 @@
 @extends('layout')
 
 @section('content')
-  <h1>Создать сеанс</h1>
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-9">
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+                <div>
+                    <span class="badge badge-soft rounded-pill px-3 py-2 mb-2">Новый сеанс</span>
+                    <h1 class="fw-semibold mb-0" style="color: var(--brand-primary);">Создание сеанса</h1>
+                    <p class="text-muted mb-0">Добавьте клиента, выберите косметолога и укажите детали процедуры.</p>
+                </div>
+                <a href="{{ route('sessions.index') }}" class="btn btn-outline-secondary rounded-pill px-4">Назад к списку</a>
+            </div>
 
-  @if ($errors->any())
-    <div style="color:red">
-      <ul>
-        @foreach ($errors->all() as $e)
-          <li>{{ $e }}</li>
-        @endforeach
-      </ul>
+            <form action="{{ route('sessions.store') }}" method="POST" class="needs-validation" novalidate>
+                @csrf
+                @include('sessions._form', [
+                    'clients' => $clients,
+                    'cosmetologists' => $cosmetologists,
+                    'statuses' => [
+                        'scheduled' => 'Запланирован',
+                        'done' => 'Проведён',
+                        'canceled' => 'Отменён',
+                        'no_show' => 'Не явился',
+                    ],
+                    'submitLabel' => 'Сохранить сеанс',
+                    'title' => 'Создание сеанса',
+                ])
+            </form>
+        </div>
     </div>
-  @endif
-
-  <form action="{{ route('sessions.store') }}" method="POST">
-    @csrf
-
-    <div>
-      <label>Клиент</label>
-      <select name="client_id" required>
-        <option value="">— выберите —</option>
-        @foreach($clients as $c)
-          <option value="{{ $c->id }}" @selected(old('client_id')==$c->id)>
-            {{ $c->full_name }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-
-    <div>
-      <label>Косметолог</label>
-      <select name="cosmetologist_id" required>
-        <option value="">— выберите —</option>
-        @foreach($cosmetologists as $m)
-          <option value="{{ $m->id }}" @selected(old('cosmetologist_id')==$m->id)>
-            {{ $m->full_name }}
-          </option>
-        @endforeach
-      </select>
-    </div>
-
-    <div>
-      <label>Начало</label>
-      <input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}" required>
-    </div>
-
-    <div>
-      <label>Окончание</label>
-      <input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}" required>
-    </div>
-
-    <div>
-      <label>Кабинет</label>
-      <input type="text" name="room" value="{{ old('room') }}" maxlength="50">
-    </div>
-
-    <div>
-      <label>Статус</label>
-      <select name="status" required>
-        @foreach(['scheduled'=>'запланирован','done'=>'проведён','canceled'=>'отменён','no_show'=>'не явился'] as $k=>$v)
-          <option value="{{ $k }}" @selected(old('status','scheduled')==$k)>{{ $v }}</option>
-        @endforeach
-      </select>
-    </div>
-
-    <div>
-      <label>Заметки</label>
-      <textarea name="notes">{{ old('notes') }}</textarea>
-    </div>
-
-    <button type="submit">Сохранить</button>
-    <a href="{{ route('sessions.index') }}">Отмена</a>
-  </form>
 @endsection

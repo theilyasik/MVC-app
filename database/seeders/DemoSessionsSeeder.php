@@ -17,64 +17,51 @@ class DemoSessionsSeeder extends Seeder
         DB::statement('TRUNCATE TABLE provided_services RESTART IDENTITY CASCADE');
         DB::statement('TRUNCATE TABLE sessions RESTART IDENTITY CASCADE');
 
-        $clients       = Client::orderBy('id')->take(3)->get();
-        $cosmetologists= Cosmetologist::orderBy('id')->take(3)->get();
-        $services      = Service::where('is_active', true)->orderBy('id')->take(3)->get();
+        $clients        = Client::orderBy('id')->get();
+        $cosmetologists = Cosmetologist::orderBy('id')->get();
+        $services       = Service::where('is_active', true)->orderBy('id')->get();
 
         if ($clients->isEmpty() || $cosmetologists->isEmpty() || $services->isEmpty()) {
-            $this->command?->warn('Нужно сначала засидить клиентов/косметологов/услуги.');
+            $this->command?->warn('Нужно сначала засеять клиентов, косметологов и услуги.');
             return;
         }
 
-        // 1-й сеанс
-        $s1 = Session::create([
-            'client_id'        => $clients[0]->id,
-            'cosmetologist_id' => $cosmetologists[0]->id,
-            'starts_at'        => Carbon::now()->addDays(1)->setTime(10, 0),
-            'ends_at'          => Carbon::now()->addDays(1)->setTime(11, 0),
-            'room'             => '101',
-            'status'           => 'scheduled',
-            'notes'            => 'Демонстрационный сеанс #1',
-        ]);
-        $s1->services()->attach($services[0]->id, [
-            'quantity'          => 1,
-            'unit_price_cents'  => $services[0]->price_cents,
-        ]);
+        $cosmetologistCount = $cosmetologists->count();
+        $serviceCount       = $services->count();
 
-        // 2-й сеанс (две услуги в одном сеансе)
-        $s2 = Session::create([
-            'client_id'        => $clients[min(1, $clients->count()-1)]->id,
-            'cosmetologist_id' => $cosmetologists[min(1, $cosmetologists->count()-1)]->id,
-            'starts_at'        => Carbon::now()->addDays(2)->setTime(12, 0),
-            'ends_at'          => Carbon::now()->addDays(2)->setTime(13, 30),
-            'room'             => '202',
-            'status'           => 'scheduled',
-            'notes'            => 'Демонстрационный сеанс #2',
-        ]);
-        $s2->services()->attach($services[0]->id, [
-            'quantity'          => 1,
-            'unit_price_cents'  => $services[0]->price_cents,
-        ]);
-        if ($services->count() > 1) {
-            $s2->services()->attach($services[1]->id, [
-                'quantity'          => 1,
-                'unit_price_cents'  => $services[1]->price_cents,
-            ]);
+        foreach ($clients as $index => $client) {
+            $sessionPerClient = random_int(2, 3);
+
+            for ($i = 0; $i < $sessionPerClient; $i++) {
+                $cosmetologist = $cosmetologists[($index + $i) % $cosmetologistCount];
+                $serviceSample = $services[($index + $i) % $serviceCount];
+
+                $start = Carbon::now()->addDays($index * 2 + $i)->setTime(10 + ($i * 2), [0, 30][random_int(0, 1)], 0);
+                $end   = (clone $start)->addMinutes($serviceSample->duration_minutes);
+
+                $session = Session::create([
+                    'client_id'        => $client->id,
+                    'cosmetologist_id' => $cosmetologist->id,
+                    'starts_at'        => $start,
+                    'ends_at'          => $end,
+                    'room'             => 'Кабинет ' . (($index + $i) % 5 + 1),
+                    'status'           => 'scheduled',
+                    'notes'            => 'Плановый визит клиента ' . $client->full_name,
+                ]);
+
+                $attachedServices = $services
+                    ->shuffle()
+                    ->take(random_int(1, 2));
+
+                foreach ($attachedServices as $service) {
+                    $session->services()->attach($service->id, [
+                        'quantity'         => random_int(1, 2),
+                        'unit_price_cents' => $service->price_cents,
+                        'created_at'       => now(),
+                        'updated_at'       => now(),
+                    ]);
+                }
+            }
         }
-
-        // 3-й сеанс
-        $s3 = Session::create([
-            'client_id'        => $clients[min(2, $clients->count()-1)]->id,
-            'cosmetologist_id' => $cosmetologists[min(2, $cosmetologists->count()-1)]->id,
-            'starts_at'        => Carbon::now()->addDays(3)->setTime(15, 0),
-            'ends_at'          => Carbon::now()->addDays(3)->setTime(16, 0),
-            'room'             => '303',
-            'status'           => 'scheduled',
-            'notes'            => 'Демонстрационный сеанс #3',
-        ]);
-        $s3->services()->attach($services[min(2, $services->count()-1)]->id, [
-            'quantity'          => 2,
-            'unit_price_cents'  => $services[min(2, $services->count()-1)]->price_cents,
-        ]);
     }
 }

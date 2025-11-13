@@ -21,7 +21,9 @@ Route::get('/services', [ServiceController::class, 'index'])->name('services.ind
 Route::get('/services/{id}', [ServiceController::class, 'show'])->name('services.show');
 
 // Сеансы: публично видны список и просмотр
-Route::resource('sessions', SessionController::class)->only(['index','show']);
+Route::resource('sessions', SessionController::class)
+    ->only(['index', 'show'])
+    ->whereNumber('session');
 
 // Сеансы: создание/редактирование/удаление — только для вошедших
 Route::middleware('auth')->group(function () {
