@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cosmetologist;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
@@ -49,5 +50,23 @@ class CosmetologistController extends Controller
         ])->findOrFail($id);
 
         return view('cosmetologists.show', compact('cosmetologist'));
+    }
+
+    public function destroy($id): RedirectResponse
+    {
+        $cosmetologist = Cosmetologist::withCount('sessions')->findOrFail($id);
+
+        if ($cosmetologist->sessions_count > 0) {
+            return redirect()
+                ->route('cosmetologists.show', $cosmetologist->id)
+                ->with('error', 'Нельзя удалить специалиста, у которого есть связанные сеансы.');
+        }
+
+        $name = $cosmetologist->full_name;
+        $cosmetologist->delete();
+
+        return redirect()
+            ->route('cosmetologists.index')
+            ->with('success', "Косметолог «{$name}» удалён.");
     }
 }

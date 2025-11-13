@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
@@ -43,8 +44,26 @@ class ClientController extends Controller
 
     public function show($id)
     {
-        $client = Client::with(['sessions.cosmetologist'])->findOrFail($id);
+        $client = Client::withCount('sessions')->findOrFail($id);
 
         return view('clients.show', compact('client'));
+    }
+
+    public function destroy($id): RedirectResponse
+    {
+        $client = Client::withCount('sessions')->findOrFail($id);
+
+        if ($client->sessions_count > 0) {
+            return redirect()
+                ->route('clients.show', $client->id)
+                ->with('error', 'Нельзя удалить клиента с историей сеансов. Сначала удалите связанные записи.');
+        }
+
+        $name = $client->full_name;
+        $client->delete();
+
+        return redirect()
+            ->route('clients.index')
+            ->with('success', "Клиент «{$name}» удалён.");
     }
 }

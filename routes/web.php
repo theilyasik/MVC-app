@@ -36,7 +36,14 @@ Route::middleware('auth')->group(function () {
     ]);
 
     Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::delete('/clients/{id}', [ClientController::class, 'destroy'])
+        ->whereNumber('id')
+        ->name('clients.destroy');
+
     Route::post('/cosmetologists', [CosmetologistController::class, 'store'])->name('cosmetologists.store');
+    Route::delete('/cosmetologists/{id}', [CosmetologistController::class, 'destroy'])
+        ->whereNumber('id')
+        ->name('cosmetologists.destroy');
 });
 
 // Логин/логаут
