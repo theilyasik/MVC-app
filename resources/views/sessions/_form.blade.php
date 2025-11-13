@@ -240,7 +240,12 @@
 
                         if (prevButton) {
                             prevButton.disabled = currentIndex === 0;
-@@ -154,29 +249,61 @@ function updateView() {
+                        }
+
+                        if (nextButton) {
+                            nextButton.classList.toggle('d-none', currentIndex === totalSteps - 1);
+                        }
+
                         if (submitButton) {
                             submitButton.classList.toggle('d-none', currentIndex !== totalSteps - 1);
                         }
