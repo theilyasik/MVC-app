@@ -31,7 +31,7 @@
                                     </div>
                                     <div class="small">
                                         <div class="fw-semibold text-dark">Телефон</div>
-                                        <div class="text-muted">{{ $client->phone ?? '—' }}</div>
+                                        <div class="text-muted text-break" style="word-break: break-word;">{{ $client->phone ?? '—' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -42,7 +42,7 @@
                                     </div>
                                     <div class="small">
                                         <div class="fw-semibold text-dark">E-mail</div>
-                                        <div class="text-muted">{{ $client->email ?? '—' }}</div>
+                                        <div class="text-muted text-break" style="word-break: break-word;">{{ $client->email ?? '—' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -53,7 +53,7 @@
                                     </div>
                                     <div class="small">
                                         <div class="fw-semibold text-dark">Сеансы</div>
-                                        <div class="text-muted">{{ $client->sessions_count }} в истории</div>
+                                        <div class="text-muted text-break" style="word-break: break-word;">{{ $client->sessions_count }} в истории</div>
                                     </div>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                     </div>
                     <div class="col-md-5 d-none d-md-block">
                         <div class="ratio ratio-4x3">
-                            <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80" class="w-100 h-100 object-fit-cover" alt="Гость салона">
+                            <img src="{{ asset('images/client-placeholder.svg') }}" class="w-100 h-100 object-fit-cover" alt="Гость салона">
                         </div>
                     </div>
                 </div>
