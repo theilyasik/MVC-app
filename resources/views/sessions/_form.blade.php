@@ -8,6 +8,18 @@
         'no_show' => 'Не явился',
     ];
     $submitLabel = $submitLabel ?? 'Сохранить';
+
+    $servicesList = $services ?? collect();
+    $selectedServices = collect(old('services', isset($session)
+        ? $session->services->pluck('id')->map(fn ($id) => (string) $id)->all()
+        : []))->map(fn ($id) => (string) $id)->all();
+
+    $serviceQuantities = [];
+    if (isset($session)) {
+        $serviceQuantities = $session->services->mapWithKeys(function ($service) {
+            return [$service->id => $service->pivot->quantity];
+        })->all();
+    }
 @endphp
 
 @if ($errors->any())
@@ -21,11 +33,11 @@
     </div>
 @endif
 
-<div class="card border-0 shadow-sm session-wizard" data-step-count="3">
+<div class="card border-0 shadow-sm session-wizard" data-step-count="4">
     <div class="card-body p-4 p-lg-5">
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
             <div>
-                <span class="badge badge-soft rounded-pill px-3 py-2">Шаг <span class="wizard-current-step">1</span> из 3</span>
+                <span class="badge badge-soft rounded-pill px-3 py-2">Шаг <span class="wizard-current-step">1</span> из 4</span>
                 <h2 class="fw-semibold mt-2 mb-0" style="color: var(--brand-primary);">{{ $title ?? 'Детали сеанса' }}</h2>
             </div>
             <div class="text-muted small text-md-end">
@@ -34,7 +46,7 @@
         </div>
 
         <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-bar" style="width: 33%" data-progress-bar></div>
+            <div class="progress-bar" style="width: 25%" data-progress-bar></div>
         </div>
 
         <div class="mt-4">
@@ -65,6 +77,57 @@
             </div>
 
             <div class="wizard-step d-none" data-step="2">
+                <h5 class="fw-semibold mb-3">Выбор услуг</h5>
+                <p class="text-muted small mb-4">Отметьте процедуры, которые будут проведены во время сеанса, и укажите количество.</p>
+                <div class="row g-4">
+                    @forelse($servicesList as $service)
+                        @php
+                            $isChecked = in_array((string) $service->id, $selectedServices, true);
+                            $quantityValue = old('service_quantities.' . $service->id, $serviceQuantities[$service->id] ?? ($isChecked ? 1 : ''));
+                            $priceRub = number_format($service->price_cents / 100, 2, ',', ' ');
+                        @endphp
+                        <div class="col-xl-6 col-lg-6 col-md-12">
+                            <div class="card border-0 shadow-sm h-100 service-option-card {{ $isChecked ? 'service-option-card-active' : '' }}">
+                                <label class="d-flex align-items-start gap-3 p-4 h-100">
+                                    <input type="checkbox"
+                                           class="form-check-input mt-2 service-option-checkbox"
+                                           name="services[]"
+                                           value="{{ $service->id }}"
+                                           {{ $isChecked ? 'checked' : '' }}
+                                           data-service-target="service-{{ $service->id }}">
+                                    <div class="w-100">
+                                        <div class="d-flex flex-column gap-2 mb-3">
+                                            <div>
+                                                <h6 class="fw-semibold mb-1" style="color: var(--brand-primary);">{{ $service->name }}</h6>
+                                                <div class="text-muted small">Длительность: {{ $service->duration_minutes }} мин.</div>
+                                            </div>
+                                            <div class="badge rounded-pill text-bg-light align-self-start px-3 py-2">{{ $priceRub }} ₽</div>
+                                        </div>
+                                        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-3">
+                                            <div class="small text-muted">Количество:</div>
+                                            <input type="number"
+                                                   name="service_quantities[{{ $service->id }}]"
+                                                   id="service-{{ $service->id }}"
+                                                   class="form-control service-option-quantity"
+                                                   min="1"
+                                                   max="10"
+                                                   value="{{ $quantityValue }}"
+                                                   {{ $isChecked ? '' : 'disabled' }}
+                                                   placeholder="1">
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-warning border-0 shadow-sm">Нет доступных услуг. Добавьте их в разделе «Услуги», чтобы назначать процедуры.</div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="wizard-step d-none" data-step="3">
                 <h5 class="fw-semibold mb-3">Время проведения</h5>
                 <div class="row g-4">
                     <div class="col-md-6">
@@ -80,7 +143,7 @@
                 </div>
             </div>
 
-            <div class="wizard-step d-none" data-step="3">
+            <div class="wizard-step d-none" data-step="4">
                 <h5 class="fw-semibold mb-3">Дополнительная информация</h5>
                 <div class="row g-4">
                     <div class="col-md-6">
@@ -113,13 +176,45 @@
     </div>
 </div>
 
+@push('styles')
+    @once
+        <style>
+            .service-option-card {
+                transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+                border: 1px solid rgba(95, 61, 156, 0.08);
+            }
+
+            .service-option-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 30px rgba(95, 61, 156, 0.12) !important;
+            }
+
+            .service-option-card-active {
+                border-color: rgba(95, 61, 156, 0.35) !important;
+                box-shadow: 0 12px 30px rgba(95, 61, 156, 0.18) !important;
+            }
+
+            .service-option-checkbox {
+                width: 1.3rem;
+                height: 1.3rem;
+            }
+
+            .service-option-quantity {
+                max-width: 120px;
+            }
+        </style>
+    @endonce
+@endpush
+
 @push('scripts')
     @once
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll('.session-wizard').forEach(function (wizard) {
                     var steps = wizard.querySelectorAll('.wizard-step');
-                    if (!steps.length) return;
+                    if (!steps.length) {
+                        return;
+                    }
 
                     var currentIndex = 0;
                     var progressBar = wizard.querySelector('[data-progress-bar]');
@@ -145,12 +240,7 @@
 
                         if (prevButton) {
                             prevButton.disabled = currentIndex === 0;
-                        }
-
-                        if (nextButton) {
-                            nextButton.classList.toggle('d-none', currentIndex === totalSteps - 1);
-                        }
-
+@@ -154,29 +249,61 @@ function updateView() {
                         if (submitButton) {
                             submitButton.classList.toggle('d-none', currentIndex !== totalSteps - 1);
                         }
@@ -175,6 +265,38 @@
                     }
 
                     updateView();
+                });
+
+                document.querySelectorAll('.service-option-card').forEach(function (card) {
+                    var checkbox = card.querySelector('.service-option-checkbox');
+                    var quantityInput = card.querySelector('.service-option-quantity');
+
+                    if (!checkbox || !quantityInput) {
+                        return;
+                    }
+
+                    var storedValue = quantityInput.value;
+
+                    function syncState() {
+                        var isChecked = checkbox.checked;
+                        card.classList.toggle('service-option-card-active', isChecked);
+                        quantityInput.disabled = !isChecked;
+
+                        if (isChecked) {
+                            if (!quantityInput.value) {
+                                quantityInput.value = storedValue || 1;
+                            }
+                        } else {
+                            storedValue = quantityInput.value;
+                        }
+                    }
+
+                    checkbox.addEventListener('change', syncState);
+                    quantityInput.addEventListener('input', function () {
+                        storedValue = quantityInput.value;
+                    });
+
+                    syncState();
                 });
             });
         </script>

@@ -37,7 +37,7 @@
                     <form action="{{ route('services.index') }}" method="GET" class="row gy-3 gx-4 align-items-end">
                         <div class="col-sm-4 col-md-3">
                             <label for="perpage" class="form-label text-muted small">Услуг на странице</label>
-                            @php $pp = (int) request('perpage', 10); @endphp
+                            @php $pp = (int) request('perpage', 15); @endphp
                             <select name="perpage" id="perpage" class="form-select rounded-pill" onchange="this.form.submit()">
                                 @foreach([5,10,15,20,50] as $opt)
                                     <option value="{{ $opt }}" {{ $pp === $opt ? 'selected' : '' }}>{{ $opt }}</option>

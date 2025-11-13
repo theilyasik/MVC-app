@@ -9,7 +9,12 @@ class Cosmetologist extends Model
 {
     protected $table = 'cosmetologists';
 
-    protected $fillable = ['full_name'];
+    protected $fillable = [
+        'full_name',
+        'specialization',
+        'phone',
+        'email',
+    ];
 
     public $timestamps = true;
 

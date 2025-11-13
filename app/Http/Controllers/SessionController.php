@@ -153,13 +153,12 @@ class SessionController extends Controller
     }
 
     public function edit(Session $session)
-{
     {
         if (Gate::denies('edit-session', $session)) {
             return redirect()->route('error')
                 ->with('message', "Недостаточно прав для редактирования сеанса #{$session->id}");
         }
-    }
+        
         return view('sessions.edit', [
             'session'        => $session->load(['client', 'cosmetologist', 'services']),
             'clients'        => Client::orderBy('full_name')->get(),

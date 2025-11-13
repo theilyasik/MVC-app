@@ -57,7 +57,7 @@
                             <div>
                                 <label for="perpage" class="form-label text-muted small mb-1">Записей на странице</label>
                                 <select name="perpage" id="perpage" class="form-select rounded-pill" onchange="this.form.submit()">
-                                    @php $pp = (int) request('perpage', 10); @endphp
+                                    @php $pp = (int) request('perpage', 15); @endphp
                                     @foreach([5,10,15,20,50] as $opt)
                                         <option value="{{ $opt }}" {{ $pp === $opt ? 'selected' : '' }}>{{ $opt }}</option>
                                     @endforeach
