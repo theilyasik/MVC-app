@@ -51,8 +51,8 @@
                             <div class="list-group list-group-flush">
                                 @foreach($service->sessions as $session)
                                     <div class="list-group-item px-0 py-4">
-                                        <div class="d-flex flex-column flex-md-row gap-3 align-items-md-start justify-content-between">
-                                            <div>
+                                        <div class="row g-3 align-items-start">
+                                        <div class="col-md">
                                                 <a href="{{ route('sessions.show', $session->id) }}" class="text-decoration-none">
                                                     <h3 class="h5 fw-semibold mb-1" style="color: var(--brand-primary);">{{ $session->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }}</h3>
                                                 </a>
@@ -66,8 +66,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="text-md-end flex-md-shrink-0 align-self-md-start">
-                                            <a href="{{ route('sessions.show', $session->id) }}" class="btn btn-outline-secondary rounded-pill px-4">Подробнее</a>
+                                        <div class="col-md-auto d-flex align-items-start justify-content-md-end">
+                                            <a href="{{ route('sessions.show', $session->id) }}" class="btn btn-outline-secondary rounded-pill px-4 w-100 w-md-auto">Подробнее</a>
                                         </div>
                                     </div>
                                 @endforeach

@@ -234,6 +234,13 @@ class SessionController extends Controller
         return redirect()->route('sessions.show', $session->id)
             ->with('success', 'Сеанс обновлён');
     }
+
+    
+    public function updateStatus(Request $request, Session $session)
+    {
+        return (new SessionStatusController())($request, $session);
+    }
+
     public function destroy(Session $session)
     {
         if (Gate::denies('delete-session', $session)) {
