@@ -17,6 +17,7 @@
                 @include('sessions._form', [
                     'clients' => $clients,
                     'cosmetologists' => $cosmetologists,
+                    'services' => $services,
                     'statuses' => [
                         'scheduled' => 'Запланирован',
                         'done' => 'Проведён',
