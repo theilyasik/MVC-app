@@ -1,6 +1,14 @@
 @extends('layout')
 
 @section('content')
+    @php
+        $statusLabels = [
+            'scheduled' => 'Запланирован',
+            'done'      => 'Проведён',
+            'canceled'  => 'Отменён',
+            'no_show'   => 'Не явился',
+        ];
+    @endphp
     <div class="row justify-content-center mb-4">
         <div class="col-xl-10 col-lg-11">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
@@ -107,8 +115,8 @@
                                         <td>{{ optional($s->client)->full_name ?? '—' }}</td>
                                         <td>{{ optional($s->cosmetologist)->full_name ?? '—' }}</td>
                                         <td>
-                                            <div class="fw-semibold">{{ $s->starts_at }}</div>
-                                            <div class="text-muted small">до {{ $s->ends_at }}</div>
+                                            <div class="fw-semibold">{{ $s->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }}</div>
+                                            <div class="text-muted small">до {{ $s->ends_at->locale(app()->getLocale())->isoFormat('HH:mm') }}</div>
                                         </td>
                                         <td class="small">
                                             @if($s->services->isNotEmpty())
@@ -123,17 +131,43 @@
                                         </td>
                                         <td class="text-end">
                                             @auth
-                                                <div class="btn-group" role="group" aria-label="Действия">
-                                                    @can('edit-session', $s)
-                                                        <a href="{{ route('sessions.edit', $s->id) }}" class="btn btn-sm btn-outline-secondary rounded-pill">Редактировать</a>
-                                                    @endcan
-                                                    @can('delete-session', $s)
-                                                        <form action="{{ route('sessions.destroy', $s->id) }}" method="POST" class="ms-2 d-inline" onsubmit="return confirm('Удалить этот сеанс?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Удалить</button>
-                                                        </form>
-                                                    @endcan
+                                                <div class="d-flex flex-column align-items-end gap-2">
+                                                    <div class="d-flex flex-wrap justify-content-end gap-2">
+                                                        <span class="badge rounded-pill text-bg-light">
+                                                            {{ $statusLabels[$s->status] ?? $s->status }}
+                                                        </span>
+                                                        @can('edit-session', $s)
+                                                            @if($s->status !== 'done')
+                                                                <form action="{{ route('sessions.update-status', $s->id) }}" method="POST" class="d-inline">
+                                                                    @csrf
+                                                                    @method('PATCH')
+                                                                    <input type="hidden" name="status" value="done">
+                                                                    <button type="submit" class="btn btn-sm btn-outline-success rounded-pill d-inline-flex align-items-center gap-1">
+                                                                        <i class="bi bi-check-lg"></i>
+                                                                        Отметить как проведён
+                                                                    </button>
+                                                                </form>
+                                                            @else
+                                                                <span class="text-success small d-inline-flex align-items-center gap-1">
+                                                                    <i class="bi bi-check-circle-fill"></i>
+                                                                    Отмечен как проведён
+                                                                </span>
+                                                            @endif
+                                                        @endcan
+                                                    </div>
+
+                                                    <div class="btn-group" role="group" aria-label="Действия">
+                                                        @can('edit-session', $s)
+                                                            <a href="{{ route('sessions.edit', $s->id) }}" class="btn btn-sm btn-outline-secondary rounded-pill">Редактировать</a>
+                                                        @endcan
+                                                        @can('delete-session', $s)
+                                                            <form action="{{ route('sessions.destroy', $s->id) }}" method="POST" class="ms-2 d-inline" onsubmit="return confirm('Удалить этот сеанс?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">Удалить</button>
+                                                            </form>
+                                                        @endcan
+                                                    </div>
                                                 </div>
                                             @else
                                                 <span class="text-muted small">Требуется вход</span>

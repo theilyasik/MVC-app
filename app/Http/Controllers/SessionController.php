@@ -149,7 +149,14 @@ class SessionController extends Controller
     {
         $session->load(['client', 'cosmetologist', 'services']);
 
-        return view('sessions.show', compact('session'));
+        $totalCents = $session->services->sum(function ($service) {
+            return (int) $service->pivot->quantity * (int) $service->pivot->unit_price_cents;
+        });
+
+        return view('sessions.show', [
+            'session'    => $session,
+            'totalCents' => $totalCents,
+        ]);
     }
 
     public function edit(Session $session)

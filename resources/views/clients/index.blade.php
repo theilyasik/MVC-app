@@ -161,7 +161,7 @@
                                 </div>
                                 @if ($client->birthdate)
                                     <div class="mb-3 small text-muted">
-                                        <i class="bi bi-gift-fill me-2 text-primary"></i> Дата рождения: {{ \Carbon\Carbon::parse($client->birthdate)->translatedFormat('d F Y') }}
+                                        <i class="bi bi-gift-fill me-2 text-primary"></i> Дата рождения: {{ \Carbon\Carbon::parse($client->birthdate)->locale(app()->getLocale())->isoFormat('D MMMM YYYY') }}
                                     </div>
                                 @endif
                                 <div class="mt-auto">

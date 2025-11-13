@@ -24,14 +24,18 @@ class ServiceController extends Controller
     // просмотр конкретной услуги + связанные сеансы
     public function show(int $id)
     {
-        $service = Service::with([
-            'sessions' => fn ($query) => $query
-                ->with([
-                    'client:id,full_name',
-                    'cosmetologist:id,full_name',
-                ])
-                ->orderByDesc('starts_at'),
-        ])->findOrFail($id);
+        $service = Service::findOrFail($id);
+
+        if (auth()->check()) {
+            $service->load([
+                'sessions' => fn ($query) => $query
+                    ->with([
+                        'client:id,full_name',
+                        'cosmetologist:id,full_name',
+                    ])
+                    ->orderByDesc('starts_at'),
+            ]);
+        }
 
         return view('services.show', compact('service'));
     }

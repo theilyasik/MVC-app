@@ -38,8 +38,8 @@
 
           <dt class="col-5 text-muted small">Время</dt>
           <dd class="col-7 mb-0 fw-medium">
-            {{ $session->starts_at }}<br>
-            <span class="text-muted">→ {{ $session->ends_at }}</span>
+            {{ $session->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }}<br>
+            <span class="text-muted">→ {{ $session->ends_at->locale(app()->getLocale())->isoFormat('HH:mm') }}</span>
           </dd>
 
           <dt class="col-5 text-muted small">Заметки</dt>
@@ -125,7 +125,7 @@
             <div class="text-end">
               <div class="text-muted small text-uppercase">Итого</div>
               <div class="display-6 fw-semibold" style="font-size: 1.75rem;">
-                {{ number_format(($totalCents ?? 0)/100, 2, ',', ' ') }} ₽
+                {{ number_format($totalCents / 100, 2, ',', ' ') }} ₽
               </div>
             </div>
           </div>
