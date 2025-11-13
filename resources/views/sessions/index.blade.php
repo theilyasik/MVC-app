@@ -107,8 +107,8 @@
                                         <td>{{ optional($s->client)->full_name ?? '—' }}</td>
                                         <td>{{ optional($s->cosmetologist)->full_name ?? '—' }}</td>
                                         <td>
-                                            <div class="fw-semibold">{{ $s->starts_at }}</div>
-                                            <div class="text-muted small">до {{ $s->ends_at }}</div>
+                                            <div class="fw-semibold">{{ $s->starts_at->locale(app()->getLocale())->isoFormat('D MMMM YYYY, HH:mm') }}</div>
+                                            <div class="text-muted small">до {{ $s->ends_at->locale(app()->getLocale())->isoFormat('HH:mm') }}</div>
                                         </td>
                                         <td class="small">
                                             @if($s->services->isNotEmpty())

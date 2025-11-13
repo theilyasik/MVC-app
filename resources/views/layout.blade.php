@@ -93,10 +93,12 @@
         <div class="collapse navbar-collapse" id="mainNav">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Главная</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url('/clients') }}">Клиенты</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url('/cosmetologists') }}">Косметологи</a></li>
                 <li class="nav-item"><a class="nav-link" href="{{ url('/services') }}">Услуги</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ route('sessions.index') }}">Сеансы</a></li>
+                @auth
+                    <li class="nav-item"><a class="nav-link" href="{{ url('/clients') }}">Клиенты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url('/cosmetologists') }}">Косметологи</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('sessions.index') }}">Сеансы</a></li>
+                @endauth
             </ul>
             <div class="d-flex align-items-center gap-3">
                 @guest
