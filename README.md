@@ -1,61 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Beauty Salon MVC App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This Laravel-based MVC application models a beauty salon workflow with clear separation between public pages and authenticated staff tools. It ships with seed data so you can explore the domain quickly and extends the default Laravel starter with entities for clients, cosmetologists, services, and appointment sessions.
 
-## About Laravel
+## Features
+- Browse public lists and detail pages for clients, cosmetologists, services, and booked sessions.
+- Authenticated staff can create, update, or delete clients, cosmetologists, services, and sessions.
+- Session status updates (e.g., scheduled, completed, canceled) via dedicated endpoints.
+- Pre-seeded demo data, including admin and staff accounts, for instant local exploration.
+- Vite-powered frontend asset pipeline and Laravel Blade views.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Tech Stack
+- PHP 8.x with [Laravel](https://laravel.com/)
+- MySQL or another database supported by Laravel
+- Node.js 18+ and npm for frontend assets via Vite
+- Composer for PHP dependency management
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Getting Started
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Prerequisites
+- PHP 8.1+ with Composer installed
+- Node.js 18+ with npm
+- A database server (MySQL recommended)
 
-## Learning Laravel
+### Installation
+1. **Clone the repository**
+   ```bash
+   git clone <your-fork-or-clone-url>
+   cd MVC-app
+   ```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+3. **Install frontend dependencies**
+   ```bash
+   npm install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+4. **Configure environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Update the `.env` file with your database credentials and desired app URL.
 
-## Laravel Sponsors
+5. **Run migrations and seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
+   Seeders create sample clients, cosmetologists, services, demo sessions, and two login accounts:
+   - Admin: `admin@beauty-salon.test` / `admin123`
+   - Staff: `staff@beauty-salon.test` / `staff123`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+6. **Start the development servers**
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
+   Visit the app at the URL printed by `php artisan serve` (typically `http://127.0.0.1:8000`).
 
-### Premium Partners
+### Building for Production
+Generate optimized frontend assets:
+```bash
+npm run build
+```
+Serve the app via a production web server (e.g., Nginx + PHP-FPM) pointing to the `public/` directory.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Running Tests
+```bash
+php artisan test
+```
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Publishing to GitHub
+1. Create a new empty repository on GitHub (without initializing with a README).
+2. In this project root, initialize Git if needed and add the remote:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git branch -M main
+   git remote add origin https://github.com/<your-username>/<repo-name>.git
+   ```
+3. Push the code to GitHub:
+   ```bash
+   git push -u origin main
+   ```
+4. Add future changes with `git add`, `git commit`, and `git push` to keep the GitHub repository up to date.
 
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
